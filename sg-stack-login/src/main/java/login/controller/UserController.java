@@ -1,4 +1,4 @@
-/*
+
 package login.controller;
 
 import login.dto.UserRequest;
@@ -64,7 +64,7 @@ public class UserController {
     }
 
     //Login
-    @GetMapping("/login")
+    @PostMapping("/login")
     public ResponseEntity<UserResponse> Login(@RequestBody UserRequest userRequest){
         String result = userService.login(userRequest);
         if(result=="1"){
@@ -78,4 +78,3 @@ public class UserController {
         return ResponseEntity.ok().body(new UserResponse(result,newlyAddedUser.getName(),newlyAddedUser.isUserType(),newlyAddedUser.getEmail(),newlyAddedUser.getMobileNo()));
     }
 }
-*/
