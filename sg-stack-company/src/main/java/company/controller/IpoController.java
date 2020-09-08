@@ -5,7 +5,7 @@ import company.service.IpoService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+@CrossOrigin(origins = {"http://localhost:8088","http://localhost:4200"})
 @RestController
 public class IpoController {
     private IpoService ipoService;

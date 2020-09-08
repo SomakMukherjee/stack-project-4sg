@@ -23,6 +23,12 @@ public class CompanyServiceImpl implements CompanyService {
     }
 
     @Override
+    public CompanyDto getCompanyById(String id) {
+        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+        return modelMapper.map(companyRepository.findById(id).get(),CompanyDto.class);
+    }
+
+    @Override
     public Iterable<CompanyDto> getAllCompanies() {
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         Type listType = new TypeToken<List<CompanyDto>>(){}.getType();

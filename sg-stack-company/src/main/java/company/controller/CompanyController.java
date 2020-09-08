@@ -15,6 +15,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
+@CrossOrigin(origins = {"http://localhost:8088","http://localhost:4200"})
 @RestController
 public class CompanyController {
 
@@ -59,11 +60,22 @@ public class CompanyController {
         return ResponseEntity.ok().body(stockDto);
     }
 
-    @PutMapping("/companies/update/{companyId}")
+    @PutMapping("/companies/update")
     @Transactional
-    public ResponseEntity<CompanyDto> updateCompany(@RequestBody CompanyDto companyDto,@PathVariable("companyId") String companyId){
-        return new ResponseEntity<CompanyDto> (companyService.updateCompany(companyDto,companyId), HttpStatus.OK);
-
+    public ResponseEntity<CompanyDto> updateCompany(@RequestBody CompanyDto companyDto) {
+        String companyId = companyDto.getCompanyId();
+        if(companyService.ifExistsByName(companyDto.getCompanyName())){
+            if(!companyService.getCompanyByName(companyDto.getCompanyName()).getCompanyId().equals(companyDto.getCompanyId())){
+                CompanyDto result = new CompanyDto();
+                result.setCompanyName("Company with same name already exists");
+                result.setCompanyId(companyService.getCompanyByName(companyDto.getCompanyName()).getCompanyId());
+                return ResponseEntity.badRequest().body(result);
+            }
+        }
+        if (companyService.ifExistsById(companyId)) {
+            return new ResponseEntity<CompanyDto>(companyService.updateCompany(companyDto, companyId), HttpStatus.OK);
+        }
+        return ResponseEntity.notFound().build();
     }
 
     @DeleteMapping("/companies/delete/{companyId}")
@@ -71,7 +83,7 @@ public class CompanyController {
     public ResponseEntity<String> deleteCompany(@PathVariable("companyId") String companyId){
 
         companyService.deleteCompany(companyId);
-        return new ResponseEntity<String>("Successfully Deleted!!!", HttpStatus.OK);
+        return ResponseEntity.ok().body("Successfully Deleted");
 
     }
 
@@ -104,6 +116,14 @@ public class CompanyController {
         List<StockDto> x = stockService.getStockByCompanyCode(companyCode);
         if (x.size() > 0) {
             return ResponseEntity.ok().body(x.get(0));
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+    @GetMapping("/companies/id/{id}")
+    public ResponseEntity<CompanyDto> getCompanyById(@PathVariable("id") String id) {
+        if (companyService.ifExistsById(id)) {
+            return ResponseEntity.ok().body(companyService.getCompanyById(id));
         }
         return ResponseEntity.notFound().build();
     }
@@ -197,9 +217,20 @@ public class CompanyController {
 
 
     //get list of companies in SE // Do from Company POV
-    @GetMapping("/please/work/{stockExchange}")
+    @GetMapping("/stock/getCompanies/{stockExchange}")
     public ResponseEntity<List<CompanyDto>>  getCompaniesInStockExchange(@PathVariable("stockExchange") String stockExchange){
         return ResponseEntity.ok().body(companyService.getCompanyByStockExchange(stockExchange));
+    }
+    //get all stock codes in stock exchange of companies in SE
+    @GetMapping("/stockCodes/{stockExchange}")
+    public ResponseEntity<List<String>>  getStockCodesInStockExchange(@PathVariable("stockExchange") String stockExchange){
+        List<CompanyDto> temp = companyService.getCompanyByStockExchange(stockExchange);
+        List<String> result = new ArrayList<>();
+        for(int i =0;i<temp.size();i++){
+            List<String> stockExchangeList = temp.get(i).getStockExchanges();
+            result.add(temp.get(i).getCodeInStockExchange().get(stockExchangeList.indexOf(stockExchange)));
+        }
+        return ResponseEntity.ok().body(result);
     }
 
     //remove company from SE //Visible from Company POV

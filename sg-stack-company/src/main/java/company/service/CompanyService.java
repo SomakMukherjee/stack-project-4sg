@@ -7,6 +7,7 @@ import java.util.Optional;
 
 public interface CompanyService {
 
+    public CompanyDto getCompanyById(String id);
     public Iterable<CompanyDto> getAllCompanies();
     public CompanyDto getCompanyByName(String name);
     public CompanyDto addCompany(CompanyDto companyDto);

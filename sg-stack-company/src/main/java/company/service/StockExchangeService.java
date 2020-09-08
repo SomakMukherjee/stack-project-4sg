@@ -12,4 +12,6 @@ public interface StockExchangeService {
     public StockExchangeDto deleteStockExchange(String id);
     public boolean existsById(String id);
     public boolean existsByStockExchange(String stockExchange);
+
+    public StockExchangeDto findById(String id);
 }

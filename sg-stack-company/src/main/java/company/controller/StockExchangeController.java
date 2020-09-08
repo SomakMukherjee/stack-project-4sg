@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-
+@CrossOrigin(origins = {"http://localhost:8088","http://localhost:4200"})
 @RestController
 public class StockExchangeController {
 
@@ -15,6 +15,11 @@ public class StockExchangeController {
     }
     @Autowired
     private StockExchangeService stockExchangeService;
+
+    @GetMapping("/stockExchanges/{id}")
+    public ResponseEntity<StockExchangeDto> getStockExchangeById(@PathVariable("id") String id){
+        return ResponseEntity.ok().body(stockExchangeService.findById(id));
+    }
 
     //find all
     @GetMapping("/stockExchanges")

@@ -8,6 +8,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
+@CrossOrigin(origins = {"http://localhost:8088","http://localhost:4200"})
 @RestController
 public class SectorController {
     private SectorService sectorService;
@@ -16,8 +19,8 @@ public class SectorController {
     }
 
     @GetMapping("/sectors")
-    public ResponseEntity<Iterable<SectorDto>> getAllSectors(){
-        return new ResponseEntity<Iterable<SectorDto>>(sectorService.findAll(), HttpStatus.OK);
+    public ResponseEntity<List<SectorDto>> getAllSectors(){
+        return ResponseEntity.ok().body(sectorService.findAll());
     }
 
     //add Sector
@@ -40,6 +43,11 @@ public class SectorController {
     @PostMapping("sectors/update")
     @Transactional
     public ResponseEntity<SectorDto> updateSector(@RequestBody SectorDto sectorDto){
+        if(sectorService.ifExistsByName(sectorDto.getSectorName())){
+            if(!sectorService.findByName(sectorDto.getSectorName()).get(0).getId().equals(sectorDto.getId())){
+            return ResponseEntity.badRequest().body(new SectorDto("Sector With same name already exists",""));
+            }
+        }
         return ResponseEntity.ok().body(sectorService.addSector(sectorDto));
     }
 }

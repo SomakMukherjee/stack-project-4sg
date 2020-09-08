@@ -24,7 +24,7 @@ public class SectorServiceImpl implements SectorService{
     }
 
     @Override
-    public Iterable<SectorDto> findAll() {
+    public List<SectorDto> findAll() {
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         Type listType = new TypeToken<List<SectorDto>>(){}.getType();
         List<SectorDto> sectorDtoList = modelMapper.map(sectorRepository.findAll(),listType);
@@ -37,8 +37,11 @@ public class SectorServiceImpl implements SectorService{
     }
 
     @Override
-    public Iterable<SectorDto> findByName(String name) {
-        return null;
+    public List<SectorDto> findByName(String name) {
+        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+        Type listType = new TypeToken<List<SectorDto>>(){}.getType();
+        List<SectorDto> sectorDtoList = modelMapper.map(sectorRepository.findBySectorName(name),listType);
+        return sectorDtoList;
     }
 
     @Override
@@ -51,8 +54,10 @@ public class SectorServiceImpl implements SectorService{
     @Override
     public SectorDto deleteSectorByName(String name) {
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
-        Sector sector =  sectorRepository.deleteBySectorName(name).get();
+        Sector sector =  sectorRepository.findBySectorName(name).get(0);
+        sectorRepository.deleteBySectorName(name);
         return modelMapper.map(sector,SectorDto.class);
+
     }
 
     @Override
@@ -60,7 +65,7 @@ public class SectorServiceImpl implements SectorService{
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         Type listType = new TypeToken<List<CompanyDto>>(){}.getType();
         if(sectorRepository.existsBySectorName(sectorName)) {
-            List<CompanyDto> companyDtoList = modelMapper.map(sectorRepository.findBySectorName(sectorName).get().getCompanyList(), listType);
+            List<CompanyDto> companyDtoList = modelMapper.map(sectorRepository.findBySectorName(sectorName).get(0).getCompanyList(), listType);
             return companyDtoList;
         }
         return null;
@@ -69,5 +74,10 @@ public class SectorServiceImpl implements SectorService{
     @Override
     public boolean ifExistsById(String id){
         return sectorRepository.existsById(id);
+    }
+
+    @Override
+    public boolean ifExistsByName(String sectorName) {
+        return sectorRepository.existsBySectorName(sectorName);
     }
 }

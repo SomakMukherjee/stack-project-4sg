@@ -54,4 +54,11 @@ public class StockExchangeServiceImpl implements StockExchangeService {
     public boolean existsByStockExchange(String stockExchange) {
         return stockExchangeRepository.existsByStockExchange(stockExchange);
     }
+
+    @Override
+    public StockExchangeDto findById(String id) {
+        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+        StockExchangeDto result =  modelMapper.map(stockExchangeRepository.findById(id).get(),StockExchangeDto.class);
+        return result;
+    }
 }
